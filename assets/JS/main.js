@@ -15,97 +15,94 @@ const tareas = [
         id: (math+3), description: 'Estudiar HTML', completed: true
     }
 ];
+
 let totalTasks = 3;
-let completedTasks = 0;
+let completedTasks = tareas.filter(task => task.completed).length;
 total.innerHTML = totalTasks;
+completed.innerHTML = completedTasks;
 
-tareas.forEach((tarea) => {
-    list.innerHTML += `<div class="elements">
-    <li class="elements_li" id="${tarea.id}">${tarea.id} ${tarea.description}</li>
-    <input type="checkbox" id="modificar_${tarea.id}">
-    <button type="button" id="delete_task_${tarea.id}"></button>
-    </div>
-    `;
-    const modif = document.getElementById(`modificar_${tarea.id}`);
-    const del = document.getElementById(`delete_task_${tarea.id}`);
-    modif.addEventListener('click', (event) => {
-        if (event.target.id.startsWith('modificar_')) {
-            const id = event.target.id.replace('modificar_', '');
-            const tarea = document.getElementById(id);
-            tarea.classList.toggle('completed');
-            if (tarea.classList.contains('completed')) {
-                completedTasks++;
-            } else {
-                completedTasks--;
-            }
-            completed.innerHTML = completedTasks;
-        }
+const rendering = () => {
+    tareas.forEach((tarea) => {
+        list.innerHTML += `<div class="elements" style="display: flex; flex-direction: row">
+        <li class="elements_li" id="${tarea.id}" style="list-style: none">${tarea.id} ${tarea.description}</li>
+        <input class="mod" type="checkbox" id="modificar_${tarea.id} onclick="modif('${tarea.id}')" style="height: 10px; width: auto">
+        <button class="delete" type="button" id="delete_task_${tarea.id}" onclick="delete_el('${tarea.id}')" style="height: 10px; width: 10px"></button>
+        </div>
+        `;
     });
+};
 
-    list.addEventListener('click', (event) => {
-        if (event.target.id.startsWith('delete_task_')) {
-            const id = event.target.id.replace('delete_task_', '');
-            delete_task(id);
-        }
-    });
-});
-
-const delete_task = (id) => {
-    const task = document.getElementById(id);
+const modif = (id) => {
     const check = document.getElementById(`modificar_${id}`);
-    const del = document.getElementById(`delete_task_${id}`);
-    task.remove();
-    check.remove();
-    del.remove();
+    if (check.checked) {
+        completedTasks++;
+    } else {
+        completedTasks--;
+    }
+    completed.innerHTML = completedTasks;
+};
+
+const delete_el = (id) => {
+    const element = document.getElementById(id);
+    const parentDiv = element.parentNode;
+    parentDiv.parentNode.removeChild(parentDiv);
     totalTasks--;
     total.innerHTML = totalTasks;
-}
+    completedTasks = tareas.filter(task => task.completed).length;
+    completed.innerHTML = completedTasks;
+    tareas.pop();
+};
 
-const addElement = () => {
-    const id = Math.floor(Math.random() * 99);
-    const tarea_t = {tarea: input.value, id: id, completed: false};
-    tareas.push(tarea_t);
-    totalTasks++;
-    total.innerHTML = totalTasks; 
-    list.innerHTML += `<li id="${id}">${id} ${input.value}</li>
-    <input type="checkbox" id="modificar_${id}">
-    <button type="button" id="delete_task_${id}"></button>
-    `;
-    input.value = '';
-    const modif = document.getElementById(`modificar_${id}`);
-    const del = document.getElementById(`delete_task_${id}`);
-   
-    list.addEventListener('click', (event) => {
-    if (event.target.id.startsWith('modificar_')) {
-        const id = event.target.id.replace('modificar_', '');
-        const tarea = tareas.find(t => t.id == id);
-        tarea.completed = !tarea.completed;
+rendering();
 
-        const tareaElement = document.getElementById(id);
-        tareaElement.classList.toggle('completed');
-        if (tarea.completed) {
-            completedTasks++;
-        } else {
-            completedTasks--;
+ 
+
+const add_el = () => {
+    if (input.value === "") {
+        alert("Ingrese una tarea");
+    } else {
+        const new_task = {
+            id: math,
+            description: input.value,
+            completed: false,
         }
-        completed.innerHTML = completedTasks;
+        tareas.push(new_task);
+        totalTasks++;
+        total.innerHTML = totalTasks;
+        let id = math;
+
+        const div = document.createElement('div');
+        div.className = "elements";
+        div.style.display = "flex";
+        div.style.flexDirection = "row";
+
+        const li = document.createElement('li');
+        li.className = "elements_li";
+        li.id = id;
+        li.style.listStyle = "none";
+        li.textContent = `${id} ${input.value}`;
+
+        const modif_check = document.createElement('input');
+        modif_check.className = "mod";
+        modif_check.type = "checkbox";
+        modif_check.id = `modificar_${id}`;
+        modif_check.style.height = "10px";
+        modif_check.style.width = "10px";
+        modif_check.onclick = () => modif(id);
+
+        const del_button = document.createElement('button');
+        del_button.className = "delete";
+        del_button.type = "button";
+        del_button.id = `delete_task_${id}`;
+        del_button.style.height = "10px";
+        del_button.style.width = "10px";
+        del_button.onclick = () => delete_el(id);
+
+        div.appendChild(li);
+        div.appendChild(modif_check);
+        div.appendChild(del_button);
+        list.appendChild(div);
+
+        input.value = "";
     }
-});
-
-    list.addEventListener('click', (event) => {
-        if (event.target.id.startsWith('delete_task_')) {
-            const id = event.target.id.replace('delete_task_', '');
-            delete_task(id);
-        }
-    });
-    total.innerHTML = totalTasks;
-}
-
-btn.addEventListener("click", addElement);
-
-input.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-        event.preventDefault();
-        addElement();
-    }
-});
+};
