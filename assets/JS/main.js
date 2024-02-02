@@ -7,7 +7,7 @@ let total_count = 0;
 let completed_count = 0;
 let generatedIds = [];
 
-function generateUniqueId() {
+const generateUniqueId = () => {
     let id;
     do {
         id = Math.floor(Math.random() * 99) + 1; // Genera un número aleatorio entre 1 y 99
@@ -23,25 +23,25 @@ const tasks = [
     {id: generateUniqueId(), name: 'Tarea 3', completed: true},
 ];
 
-function countTotalTasks() {
+const countTotalTasks = () => {
     total_count = tasks.length;
 }
 
-function countCompletedTasks() {
+const countCompletedTasks = () => {
     completed_count = tasks.filter(task => task.completed).length;
 }
 
-function renderTotalTasksCount() {
+const renderTotalTasksCount = () => {
     countTotalTasks();
     total.innerHTML = `${total_count}`;
 }
 
-function renderCompletedTasksCount() {
+const renderCompletedTasksCount = () => {
     countCompletedTasks();
     completed.innerHTML = `${completed_count}`;
 }
 
-function renderTasks() {
+const renderTasks = () => {
     list.innerHTML = ''; // Limpiar el contenedor de tareas
 
     tasks.forEach(task => {
@@ -72,7 +72,7 @@ renderTasks();
 renderTotalTasksCount();
 renderCompletedTasksCount();
 
-function addTask(name) {
+const addTask = (name) => {
     const newTask = {
         id: generateUniqueId(),
         name,
@@ -86,7 +86,7 @@ function addTask(name) {
     new_task.value = '';
 }
 
-function deleteTask(id) {
+const deleteTask = (id) => {
     const taskIndex = tasks.findIndex(task => task.id === id);
     if (taskIndex !== -1) {
         if (tasks[taskIndex].completed) {
@@ -99,7 +99,7 @@ function deleteTask(id) {
     }
 }
 
-function toggleCompleted(id) {
+const toggleCompleted = (id) => {
     const task = tasks.find(task => task.id === id);
     if (task) {
         task.completed = !task.completed;
