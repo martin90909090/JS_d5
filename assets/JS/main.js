@@ -1,149 +1,118 @@
-const list = document.getElementById("task_list");
-const input = document.getElementById("new_task");
-const btn = document.getElementById("add_task");
-let total = document.getElementById("total_tasks");
-let completed = document.getElementById("completed_tasks");
-const math = Math.floor(Math.random() * 99);
-const tareas = [
-    {
-        id: (math+1), description: 'Estudiar JS', completed: true
-    }, 
-    {
-        id: (math+2), description: 'Estudiar CSS', completed: false
-    },
-    {
-        id: (math+3), description: 'Estudiar HTML', completed: true
-    }
+const new_task = document.getElementById('new_task');
+const add_task = document.getElementById('add_task');
+const total = document.getElementById('total_tasks');
+const completed = document.getElementById('completed_tasks');
+const list = document.getElementById('tasks_list');
+let total_count = 0;
+let completed_count = 0;
+let generatedIds = [];
+
+function generateUniqueId() {
+    let id;
+    do {
+        id = Math.floor(Math.random() * 99) + 1; // Genera un número aleatorio entre 1 y 99
+    } while (generatedIds.includes(id)); // Continúa generando números hasta que encuentre uno que no se haya generado antes
+
+    generatedIds.push(id); // Agrega el nuevo ID a la lista de IDs generados
+    return id;
+}
+
+const tasks = [
+    {id: generateUniqueId(), name: 'Tarea 1', completed: false},
+    {id: generateUniqueId(), name: 'Tarea 2', completed: false},
+    {id: generateUniqueId(), name: 'Tarea 3', completed: true},
 ];
 
-let count = 0;
-let i = 0;
-let totalTasks = 0;
-let completedTasks = tareas.filter(task => task.completed).length;
-total.innerHTML = totalTasks;
-completed.innerHTML = completedTasks;
+function countTotalTasks() {
+    total_count = tasks.length;
+}
 
-const rendering = () => {
-    tareas.forEach((tarea) => {
-        i++;
-        count++;
-        const new_task = {
-            id: tareas[i].id,
-            description: 'hablar inglés la siguiente cantidad de veces en la semana: ' + count,
-            completed: false,
-        }
-        tareas.push(new_task);
-        totalTasks++;
-        total.innerHTML = totalTasks;
-        let id = math;
+function countCompletedTasks() {
+    completed_count = tasks.filter(task => task.completed).length;
+}
 
-        const div = document.createElement('div');
-        div.className = "elements";
-        div.style.display = "flex";
-        div.style.flexDirection = "row";
+function renderTotalTasksCount() {
+    countTotalTasks();
+    total.innerHTML = `${total_count}`;
+}
 
-        const li = document.createElement('li');
-        li.className = "elements_li";
-        li.id = id;
-        li.style.listStyle = "none";
-        li.textContent = `${id} ${new_task.description}`;
+function renderCompletedTasksCount() {
+    countCompletedTasks();
+    completed.innerHTML = `${completed_count}`;
+}
 
-        const modif_check = document.createElement('input');
-        modif_check.className = "mod";
-        modif_check.type = "checkbox";
-        modif_check.id = `modificar_${id}`;
-        modif_check.style.height = "10px";
-        modif_check.style.width = "10px";
-        modif_check.onclick = () => modif(id);
+function renderTasks() {
+    list.innerHTML = ''; // Limpiar el contenedor de tareas
 
-        const del_button = document.createElement('button');
-        del_button.className = "delete";
-        del_button.type = "button";
-        del_button.id = `delete_task_${id}`;
-        del_button.style.height = "10px";
-        del_button.style.width = "10px";
-        del_button.onclick = () => delete_el(id);
+    tasks.forEach(task => {
+        const taskElement = document.createElement('div');
+        const deleteButton = document.createElement('button');
+        
+        deleteButton.style.height = '10px';
+        deleteButton.style.width = '10px';
+        deleteButton.onclick = () => deleteTask(task.id);
 
-        div.appendChild(li);
-        div.appendChild(modif_check);
-        div.appendChild(del_button);
-        list.appendChild(div);
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = task.completed;
+        checkbox.onchange = () => toggleCompleted(task.id);
+
+        taskElement.style.display = 'flex';
+        taskElement.style.alignItems = 'center';
+        taskElement.style.justifyContent = 'space-between';
+        taskElement.innerHTML = `<span>${task.id}: ${task.name}</span>`;
+        taskElement.appendChild(deleteButton);
+        taskElement.appendChild(checkbox);
+
+        list.appendChild(taskElement);
     });
-};
+}
 
-const modif = (id) => {
-    const check = document.getElementById(`modificar_${id}`);
-    const task = tareas.find(task => task.id == id);
-    if (check.checked) {
-        task.completed = true;
-    } else if (!check.checked){
-        task.completed = false;
-    }
-    completedTasks = tareas.filter(task => task.completed).length;
-    completed.innerHTML = completedTasks;
-};
+renderTasks();
+renderTotalTasksCount();
+renderCompletedTasksCount();
 
-const delete_el = (id) => {
-    const element = document.getElementById(id);
-    const parentDiv = element.parentNode;
-    parentDiv.parentNode.removeChild(parentDiv);
-    totalTasks--;
-    total.innerHTML = totalTasks;
-    completedTasks = tareas.filter(task => task.completed).length;
-    completed.innerHTML = completedTasks;
-    tareas.pop();
-};
+function addTask(name) {
+    const newTask = {
+        id: generateUniqueId(),
+        name,
+        completed: false,
+    };
+    tasks.push(newTask);
+    renderTotalTasksCount(); // Actualizar el conteo total de tareas en el HTML
+    renderTasks();
 
-rendering();
+    // Limpiar el input
+    new_task.value = '';
+}
 
- 
-
-const add_el = () => {
-    if (input.value === "") {
-        alert("Ingrese una tarea");
-    } else {
-        const new_task = {
-            id: math,
-            description: input.value,
-            completed: false,
+function deleteTask(id) {
+    const taskIndex = tasks.findIndex(task => task.id === id);
+    if (taskIndex !== -1) {
+        if (tasks[taskIndex].completed) {
+            completed_count--;
         }
-        tareas.push(new_task);
-        totalTasks++;
-        total.innerHTML = totalTasks;
-        let id = math;
-
-        const div = document.createElement('div');
-        div.className = "elements";
-        div.style.display = "flex";
-        div.style.flexDirection = "row";
-
-        const li = document.createElement('li');
-        li.className = "elements_li";
-        li.id = id;
-        li.style.listStyle = "none";
-        li.textContent = `${id} ${input.value}`;
-
-        const modif_check = document.createElement('input');
-        modif_check.className = "mod";
-        modif_check.type = "checkbox";
-        modif_check.id = `modificar_${id}`;
-        modif_check.style.height = "10px";
-        modif_check.style.width = "10px";
-        modif_check.onclick = () => modif(id);
-
-        const del_button = document.createElement('button');
-        del_button.className = "delete";
-        del_button.type = "button";
-        del_button.id = `delete_task_${id}`;
-        del_button.style.height = "10px";
-        del_button.style.width = "10px";
-        del_button.onclick = () => delete_el(id);
-
-        div.appendChild(li);
-        div.appendChild(modif_check);
-        div.appendChild(del_button);
-        list.appendChild(div);
-
-        input.value = "";
+        tasks.splice(taskIndex, 1);
+        renderTotalTasksCount(); // Actualizar el conteo total de tareas en el HTML
+        renderCompletedTasksCount(); // Actualizar el conteo de tareas completadas en el HTML
+        renderTasks();
     }
-};
+}
+
+function toggleCompleted(id) {
+    const task = tasks.find(task => task.id === id);
+    if (task) {
+        task.completed = !task.completed;
+        countTotalTasks(); // Actualizar el conteo total de tareas
+        countCompletedTasks(); // Actualizar el conteo de tareas completadas
+        renderCompletedTasksCount(); // Actualizar el conteo de tareas completadas en el HTML
+        renderTasks();
+    }
+}
+
+add_task.addEventListener('click', () => {
+    const name = new_task.value;
+    addTask(name);
+});
+
+console.log(tasks);
