@@ -10,10 +10,10 @@ let generatedIds = [];
 const generateUniqueId = () => {
     let id;
     do {
-        id = Math.floor(Math.random() * 99) + 1; // Genera un número aleatorio entre 1 y 99
-    } while (generatedIds.includes(id)); // Continúa generando números hasta que encuentre uno que no se haya generado antes
+        id = Math.floor(Math.random() * 99) + 1;
+    } while (generatedIds.includes(id));
 
-    generatedIds.push(id); // Agrega el nuevo ID a la lista de IDs generados
+    generatedIds.push(id); 
     return id;
 }
 
@@ -42,7 +42,7 @@ const renderCompletedTasksCount = () => {
 }
 
 const renderTasks = () => {
-    list.innerHTML = ''; // Limpiar el contenedor de tareas
+    list.innerHTML = ''; 
 
     tasks.forEach(task => {
         const taskElement = document.createElement('div');
@@ -79,7 +79,7 @@ const addTask = (name) => {
         completed: false,
     };
     tasks.push(newTask);
-    renderTotalTasksCount(); // Actualizar el conteo total de tareas en el HTML
+    renderTotalTasksCount();
     renderTasks();
 
     // Limpiar el input
@@ -93,8 +93,8 @@ const deleteTask = (id) => {
             completed_count--;
         }
         tasks.splice(taskIndex, 1);
-        renderTotalTasksCount(); // Actualizar el conteo total de tareas en el HTML
-        renderCompletedTasksCount(); // Actualizar el conteo de tareas completadas en el HTML
+        renderTotalTasksCount(); 
+        renderCompletedTasksCount();
         renderTasks();
     }
 }
@@ -103,9 +103,9 @@ const toggleCompleted = (id) => {
     const task = tasks.find(task => task.id === id);
     if (task) {
         task.completed = !task.completed;
-        countTotalTasks(); // Actualizar el conteo total de tareas
-        countCompletedTasks(); // Actualizar el conteo de tareas completadas
-        renderCompletedTasksCount(); // Actualizar el conteo de tareas completadas en el HTML
+        countTotalTasks();
+        countCompletedTasks(); 
+        renderCompletedTasksCount(); 
         renderTasks();
     }
 }
